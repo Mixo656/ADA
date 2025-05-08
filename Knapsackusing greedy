@@ -1,0 +1,114 @@
+#include <stdio.h>
+
+void sortArray(int n, float ratio[], float w[], float p[]);
+void displayInfo(int n, float w[], float p[], float ratio[]);
+void fractionalKnapsack(int capacity, int n, float w[], float p[]);
+void discreteKnapsack(int capacity, int n, float w[], float p[]);
+
+int main() {
+    float w[10], p[10], ratio[10];
+    int n, capacity, i;
+
+    printf("********* KNAPSACK PROBLEM *******\n");
+    printf("Enter the total number of items: ");
+    scanf("%d", &n);
+
+    printf("Enter the weight of each item:\n");
+    for (i = 0; i < n; i++)
+        scanf("%f", &w[i]);
+
+    printf("Enter the profit of each item:\n");
+    for (i = 0; i < n; i++)
+        scanf("%f", &p[i]);
+
+    printf("Enter the knapsack capacity: ");
+    scanf("%d", &capacity);
+
+    for (i = 0; i < n; i++)
+        ratio[i] = p[i] / w[i];
+
+    printf("\nInformation about knapsack problem:\n");
+    displayInfo(n, w, p, ratio);
+    printf("Capacity = %d\n", capacity);
+
+    sortArray(n, ratio, w, p);
+    printf("\nAfter sorting by Profit/Weight ratio (descending):\n");
+    displayInfo(n, w, p, ratio);
+
+    printf("\n--- Fractional (Continuous) Knapsack ---\n");
+    fractionalKnapsack(capacity, n, w, p);
+
+    printf("\n--- 0/1 (Discrete) Knapsack using Greedy Approximation ---\n");
+    discreteKnapsack(capacity, n, w, p);
+
+    printf("*************************************\n");
+    return 0;
+}
+
+void sortArray(int n, float ratio[], float w[], float p[]) {
+    int i, j;
+    for (i = 0; i < n - 1; i++) {
+        for (j = 0; j < n - i - 1; j++) {
+            if (ratio[j] < ratio[j + 1]) {
+                float temp = ratio[j];
+                ratio[j] = ratio[j + 1];
+                ratio[j + 1] = temp;
+
+                temp = w[j];
+                w[j] = w[j + 1];
+                w[j + 1] = temp;
+
+                temp = p[j];
+                p[j] = p[j + 1];
+                p[j + 1] = temp;
+            }
+        }
+    }
+}
+
+void displayInfo(int n, float w[], float p[], float ratio[]) {
+    int i;
+    printf("ITEM\tWEIGHT\tPROFIT\tRATIO\n");
+    for (i = 0; i < n; i++)
+        printf("%d\t%.2f\t%.2f\t%.2f\n", i + 1, w[i], p[i], ratio[i]);
+}
+
+void fractionalKnapsack(int capacity, int n, float w[], float p[]) {
+    float x[10] = {0}, totalProfit = 0;
+    int i;
+
+    for (i = 0; i < n; i++) {
+        if (w[i] <= capacity) {
+            x[i] = 1;
+            totalProfit += p[i];
+            capacity -= w[i];
+        } else {
+            x[i] = capacity / w[i];
+            totalProfit += x[i] * p[i];
+            break;
+        }
+    }
+
+    printf("Item selection (fractions allowed): ");
+    for (i = 0; i < n; i++)
+        printf("%.2f ", x[i]);
+    printf("\nMaximum profit = %.2f\n", totalProfit);
+}
+
+void discreteKnapsack(int capacity, int n, float w[], float p[]) {
+    int x[10] = {0}, i;
+    float totalProfit = 0;
+
+    for (i = 0; i < n; i++) {
+        if (w[i] <= capacity) {
+            x[i] = 1;
+            totalProfit += p[i];
+            capacity -= w[i];
+        }
+    }
+
+    printf("Item selection (0/1 only): ");
+    for (i = 0; i < n; i++)
+        printf("%d ", x[i]);
+    printf("\nApproximate maximum profit = %.2f\n", totalProfit);
+}
