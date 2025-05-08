@@ -1,0 +1,60 @@
+#include <stdio.h>
+
+#define INF 999
+#define MAX 10
+
+int prims(int cost[][MAX], int n) {
+    int nearV[MAX], t[MAX][2], mincost = 0;
+    int i, j, k, u = 0;
+
+    // Initialize nearV to track nearest nodes to MST
+    for (i = 1; i < n; i++)
+        nearV[i] = 0;  // Start from node 0, so initially only node 0 is in MST
+
+    for (i = 1; i < n; i++) {
+        int min = INF;
+        for (j = 1; j < n; j++) {
+            if (nearV[j] == 0 && cost[j][u] < min) {
+                min = cost[j][u];
+                k = j;
+            }
+        }
+        t[i - 1][0] = u;
+        t[i - 1][1] = k;
+        mincost += cost[u][k];
+        nearV[k] = 1;
+
+        // Update u to new node added to MST
+        u = k;
+        printf("%d) Minimum edge is (%d,%d) and its cost is: %d\n", i, t[i - 1][0], t[i - 1][1], cost[t[i - 1][0]][t[i - 1][1]]);
+    }
+
+    return mincost;
+}
+
+int main() {
+    int cost[MAX][MAX], i, j, n;
+
+    printf("********* PRIM'S ALGORITHM *********\n");
+    printf("Enter the number of nodes: ");
+    scanf("%d", &n);
+
+    printf("Enter the cost matrix (use %d for no edge):\n", INF);
+    for (i = 0; i < n; i++)
+        for (j = 0; j < n; j++)
+            scanf("%d", &cost[i][j]);
+
+    printf("The entered cost matrix is:\n");
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++)
+            printf("%d\t", cost[i][j]);
+        printf("\n");
+    }
+
+    printf("Minimum Spanning Tree Edges and Costs are:\n");
+    int mincost = prims(cost, n);
+    printf("The minimum spanning tree cost is: %d\n", mincost);
+    printf("***********************************\n");
+
+    return 0;
+}
